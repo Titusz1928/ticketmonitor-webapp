@@ -1,0 +1,87 @@
+.footer {
+  background-color: #000000; /* Pure black for a premium Nokia look */
+  color: #ffffff;
+  padding: 4rem 2rem 2rem 2rem;
+  font-family: Arial, Helvetica, sans-serif; /* Matches Nokia site style */
+  margin-top: auto; 
+  border-top: 1px solid #333;
+}
+
+.footer-content {
+  width: 100%;
+  max-width: 1440px; /* Matches the wider dashboard layout */
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 3rem;
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 250px;
+}
+
+.footer-logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  letter-spacing: -1px;
+}
+
+.footer-logo span {
+  color: #0011ff; /* Signature Nokia Blue */
+}
+
+.footer-section h3 {
+  font-size: 1rem;
+  text-transform: uppercase; /* Professional industry standard */
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+  border-bottom: 2px solid #0011ff; /* Accent line in Nokia Blue */
+  padding-bottom: 8px;
+  display: inline-block;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 0.8rem;
+}
+
+.footer-section a {
+  color: #999;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s ease-in-out;
+}
+
+.footer-section a:hover {
+  color: #0011ff; /* Hover effect matches brand color */
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #222;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    text-align: left;
+    padding: 0 1rem;
+  }
+  
+  .footer-section h3 {
+    display: block;
+    width: fit-content;
+  }
+}
