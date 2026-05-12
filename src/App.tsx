@@ -3,6 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
+import TicketList from './TicketList'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -115,6 +116,12 @@ function App() {
 
       <div className="ticks"></div>
       <section id="spacer"></section>
+
+      <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <h1>Test Conexiune React - FastAPI</h1>
+      <TicketList />
+      
+    </div>
     </>
   )
 }
