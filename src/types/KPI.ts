@@ -21,7 +21,7 @@ export interface TeamCountKPI {
 
 export interface TeamResolutionKPI {
   team: string;
-  time_hours: number;
+  average_resolution_time_hours: number;
 }
 
 export interface CategoryKPI {

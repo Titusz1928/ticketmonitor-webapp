@@ -83,8 +83,8 @@ export const KpiDashboard = () => {
 
         {/* 8. Average Resolution Time Per Team Bar Chart */}
         <KPIBarChart
-          title="Average Resolution Time per Team"
-          data={data.avg_res_time_per_team.data}
+          title="Average Resolution Time per Team (in Hours)"
+          data={data.avg_res_time_per_team}
           xKey="team"
           yKey="average_resolution_time_hours"
         />
