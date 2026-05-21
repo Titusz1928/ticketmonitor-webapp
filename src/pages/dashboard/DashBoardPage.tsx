@@ -5,12 +5,36 @@ import { KpiDashboard } from '../../components/KPIDashBoard/KPIDashBoard'; // Im
 import type { Ticket } from '../../types/Ticket';
 import './DashBoardPage.css';
 
+interface FiltersState {
+  status: string;
+  priority: string;
+  team: string;
+}
+
 export const DashboardPage = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const [filters, setFilters] = useState<FiltersState>({
+    status: '',
+    priority: '',
+    team: '',
+  });
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/tickets')
+    setLoading(true);
+
+    const params = new URLSearchParams();
+    if (filters.status) params.append('status', filters.status);
+    if (filters.priority) params.append('priority', filters.priority);
+    if (filters.team) params.append('team', filters.team);
+
+    fetch(`http://127.0.0.1:8000/tickets?${params.toString()}`)
       .then((response) => response.json())
       .then((data) => {
         setTickets(data);
@@ -20,7 +44,7 @@ export const DashboardPage = () => {
         console.error('Error fetching tickets:', error);
         setLoading(false);
       });
-  }, []);
+  }, [filters]);
 
   return (
     <>
@@ -31,9 +55,44 @@ export const DashboardPage = () => {
           <p>Real-time Incident Ticket Overview</p>
         </header>
 
-        {/* 1. High-Level Analytics (KPIs) */}
+        <section className="filter-bar">
+          <div className="filter-group">
+            <label>Status</label>
+            <select name="status" value={filters.status} onChange={handleFilterChange}>
+              <option value="">All Statuses</option>
+              <option value="Open">Open</option>
+              <option value="Assigned">Assigned</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>Priority</label>
+            <select name="priority" value={filters.priority} onChange={handleFilterChange}>
+              <option value="">All Priorities</option>
+              <option value="Critical">Critical</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>Team</label>
+            <select name="team" value={filters.team} onChange={handleFilterChange}>
+              <option value="">All Teams</option>
+              <option value="Core Network">Core Network</option>
+              <option value="Radio Access (RAN)">Radio Access (RAN)</option>
+              <option value="Fiber Operations">Fiber Operations</option>
+              <option value="IT Support">IT Support</option>
+            </select>
+          </div>
+        </section>
+
         <section className="analytics-section">
-          <KpiDashboard />
+          <KpiDashboard filters={filters} />
         </section>
 
         {/* 2. Detailed Ticket View */}
