@@ -61,7 +61,7 @@ export const DashboardPage = () => {
             <select name="status" value={filters.status} onChange={handleFilterChange}>
               <option value="">All Statuses</option>
               <option value="Open">Open</option>
-              <option value="Assigned">Assigned</option>
+              <option value="Pending">Pending</option>
               <option value="In Progress">In Progress</option>
               <option value="Resolved">Resolved</option>
               <option value="Closed">Closed</option>
@@ -84,9 +84,20 @@ export const DashboardPage = () => {
             <select name="team" value={filters.team} onChange={handleFilterChange}>
               <option value="">All Teams</option>
               <option value="Core Network">Core Network</option>
-              <option value="Radio Access (RAN)">Radio Access (RAN)</option>
+              <option value="Radio Access Network (RAN)">Radio Access (RAN)</option>
               <option value="Fiber Operations">Fiber Operations</option>
-              <option value="IT Support">IT Support</option>
+              {/* <option value="IT Support">IT Support</option> */}
+              
+              {/* Adaugate dupa executia generatorului de scripturi noi */}
+              <option value="Transmission">Transmission</option>
+              <option value="Hardware">Hardware</option>
+              <option value="Cloud Infrastructure">Cloud Infrastructure</option>
+              <option value="Security">Security</option>
+              <option value="NOC">NOC</option>
+              <option value="OSS BSS">OSS BSS</option>
+              <option value="Field Operations">Field Operations</option>
+              <option value="QA Testing">QA Testing</option>
+              <option value="Communications">Communications</option>
             </select>
           </div>
         </section>
