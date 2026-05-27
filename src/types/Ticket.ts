@@ -5,6 +5,9 @@ export interface Ticket {
     COMPANY: string;
     PROJECT: string;
     TEAM: string;
+    CATEGORY_TIER_1?: string;
+    CATEGORY_TIER_2?: string;
+    CATEGORY_TIER_3?: string;
     ASSIGNED_PERSON: string;
     SERVICE: string;
     DESCRIPTION: string;

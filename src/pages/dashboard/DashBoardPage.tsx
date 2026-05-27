@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Header } from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import { KpiDashboard } from '../../components/KPIDashBoard/KPIDashBoard'; // Import your new component
@@ -9,19 +9,29 @@ interface FiltersState {
   status: string;
   priority: string;
   team: string;
+  startDate: string;
+  endDate: string;
 }
 
 export const DashboardPage = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const dataSectionRef = useRef<HTMLElement | null>(null);
 
   const [filters, setFilters] = useState<FiltersState>({
     status: '',
     priority: '',
     team: '',
+    startDate: '',
+    endDate: '',
   });
+  const [chartSelection, setChartSelection] = useState<{
+    key: 'STATUS' | 'PRIORITY' | 'TEAM' | 'CATEGORY_TIER_1' | 'CATEGORY_TIER_2' | 'CATEGORY_TIER_3';
+    value: string;
+    source: string;
+  } | null>(null);
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
@@ -33,6 +43,8 @@ export const DashboardPage = () => {
     if (filters.status) params.append('status', filters.status);
     if (filters.priority) params.append('priority', filters.priority);
     if (filters.team) params.append('team', filters.team);
+    if (filters.startDate) params.append('startDate', filters.startDate);
+    if (filters.endDate) params.append('endDate', filters.endDate);
 
     fetch(`http://127.0.0.1:8000/tickets?${params.toString()}`)
       .then((response) => response.json())
@@ -45,6 +57,19 @@ export const DashboardPage = () => {
         setLoading(false);
       });
   }, [filters]);
+
+  const filteredTickets = chartSelection
+    ? tickets.filter((ticket) => {
+        const ticketValue = ticket[chartSelection.key];
+        return typeof ticketValue === 'string' && ticketValue === chartSelection.value;
+      })
+    : tickets;
+
+  useEffect(() => {
+    if (chartSelection && dataSectionRef.current) {
+      dataSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [chartSelection]);
 
   return (
     <>
@@ -100,15 +125,51 @@ export const DashboardPage = () => {
               <option value="Communications">Communications</option>
             </select>
           </div>
+
+          <div className="filter-group">
+            <label>Start Date</label>
+            <input
+              type="date"
+              name="startDate"
+              value={filters.startDate}
+              onChange={handleFilterChange}
+            />
+          </div>
+
+          <div className="filter-group">
+            <label>End Date</label>
+            <input
+              type="date"
+              name="endDate"
+              value={filters.endDate}
+              onChange={handleFilterChange}
+              min={filters.startDate || undefined}
+            />
+          </div>
         </section>
 
         <section className="analytics-section">
-          <KpiDashboard filters={filters} />
+          <KpiDashboard filters={filters} onChartSelection={setChartSelection} />
         </section>
 
         {/* 2. Detailed Ticket View */}
-        <section className="data-section">
-          <h2 className="section-title">Active Incident Tickets</h2>
+        <section className="data-section" ref={dataSectionRef}>
+          <div className="data-section-header">
+            <h2 className="section-title">Active Incident Tickets</h2>
+            {chartSelection && (
+              <div className="drilldown-chip">
+                <span>
+                  Filtered by <strong>{chartSelection.source}</strong>: {chartSelection.value}
+                </span>
+                <button type="button" onClick={() => setChartSelection(null)}>
+                  Clear
+                </button>
+              </div>
+            )}
+          </div>
+          <p className="result-count">
+            Showing {filteredTickets.length} of {tickets.length} tickets
+          </p>
           {loading ? (
             <p>Loading telecom data...</p>
           ) : (
@@ -125,7 +186,7 @@ export const DashboardPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tickets.map((ticket) => (
+                  {filteredTickets.map((ticket) => (
                     <tr key={ticket.TICKET_NUMBER}>
                       <td className="bold-blue">{ticket.TICKET_NUMBER}</td>
                       <td>
@@ -141,6 +202,9 @@ export const DashboardPage = () => {
                   ))}
                 </tbody>
               </table>
+              {!filteredTickets.length && (
+                <p className="empty-state">No tickets found for the selected filters.</p>
+              )}
             </div>
           )}
         </section>

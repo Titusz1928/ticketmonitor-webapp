@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { DashboardData } from '../../types/KPI';
 import KPICard from './KPICard.tsx';
 import KPIDonutChart from './KPIDonutChart.tsx';
@@ -6,7 +6,6 @@ import KPIBarChart from './KPIBarChart.tsx';
 import './KPIDashBoard.css';
 
 interface KpiDashboardProps {
-  // Module 1 migth change these
   filters: {
     status?: string;
     priority?: string;
@@ -15,13 +14,21 @@ interface KpiDashboardProps {
     startDate?: string;
     endDate?: string;
   };
+  onChartSelection?: (selection: {
+    key: 'STATUS' | 'PRIORITY' | 'TEAM' | 'CATEGORY_TIER_1' | 'CATEGORY_TIER_2' | 'CATEGORY_TIER_3';
+    value: string;
+    source: string;
+  } | null) => void;
 }
 
 type TabType = 'all' | 'overview' | 'categories' | 'teams';
 
-export const KpiDashboard = ({ filters }: KpiDashboardProps) => {
+export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) => {
 const [data, setData] = useState<DashboardData | null>(null);
 const [activeTab, setActiveTab] = useState<TabType>('all');
+
+  const topCategoryTier2 = (data?.category_tier_2 ?? []).slice(0, 10);
+  const topCategoryTier3 = (data?.category_tier_3 ?? []).slice(0, 10);
 
   useEffect(() => {
     // 1. Instantly clear data to show user that an active update is happening
@@ -75,8 +82,36 @@ return (
               <KPICard kpi={data.overdue_tickets} />
             </div>
             <div className="chart-card">
-              <KPIDonutChart title="Tickets by Status" data={data.tickets_by_status} nameKey="status" dataKey="count" />
-              <KPIBarChart title="Tickets by Priority" data={data.tickets_by_priority} xKey="priority" yKey="count" />
+              <KPIDonutChart
+                title="Tickets by Status"
+                data={data.tickets_by_status}
+                nameKey="status"
+                dataKey="count"
+                onItemClick={(item) => {
+                  if (onChartSelection) {
+                    onChartSelection({
+                      key: 'STATUS',
+                      value: item.status,
+                      source: 'Tickets by Status',
+                    });
+                  }
+                }}
+              />
+              <KPIBarChart
+                title="Tickets by Priority"
+                data={data.tickets_by_priority}
+                xKey="priority"
+                yKey="count"
+                onItemClick={(item) => {
+                  if (onChartSelection) {
+                    onChartSelection({
+                      key: 'PRIORITY',
+                      value: item.priority,
+                      source: 'Tickets by Priority',
+                    });
+                  }
+                }}
+              />
             </div>
           </>
         )}
@@ -84,16 +119,72 @@ return (
         {/* Tab 2: Categories */}
         {(activeTab === 'all' || activeTab === 'categories') && (
           <div className="chart-card">
-            <KPIDonutChart title="Category Tier 1" data={data.category_tier_1} nameKey="category" dataKey="count" />
-            <KPIDonutChart title="Category Tier 2" data={data.category_tier_2} nameKey="category" dataKey="count" />
-            <KPIDonutChart title="Category Tier 3" data={data.category_tier_3} nameKey="category" dataKey="count" />
+            <KPIDonutChart
+              title="Category Tier 1"
+              data={data.category_tier_1}
+              nameKey="category"
+              dataKey="count"
+              onItemClick={(item) => {
+                if (onChartSelection) {
+                  onChartSelection({
+                    key: 'CATEGORY_TIER_1',
+                    value: item.category,
+                    source: 'Category Tier 1',
+                  });
+                }
+              }}
+            />
+            <KPIBarChart
+              title="Category Tier 2 (Top 10)"
+              data={topCategoryTier2}
+              xKey="category"
+              yKey="count"
+              onItemClick={(item) => {
+                if (onChartSelection) {
+                  onChartSelection({
+                    key: 'CATEGORY_TIER_2',
+                    value: item.category,
+                    source: 'Category Tier 2',
+                  });
+                }
+              }}
+            />
+            <KPIBarChart
+              title="Category Tier 3 (Top 10)"
+              data={topCategoryTier3}
+              xKey="category"
+              yKey="count"
+              onItemClick={(item) => {
+                if (onChartSelection) {
+                  onChartSelection({
+                    key: 'CATEGORY_TIER_3',
+                    value: item.category,
+                    source: 'Category Tier 3',
+                  });
+                }
+              }}
+            />
           </div>
         )}
 
         {/* Tab 3: Teams */}
         {(activeTab === 'all' || activeTab === 'teams') && (
           <div className="chart-card">
-            <KPIBarChart title="Tickets per Team" data={data.tickets_per_team} xKey="team" yKey="count" />
+            <KPIBarChart
+              title="Tickets per Team"
+              data={data.tickets_per_team}
+              xKey="team"
+              yKey="count"
+              onItemClick={(item) => {
+                if (onChartSelection) {
+                  onChartSelection({
+                    key: 'TEAM',
+                    value: item.team,
+                    source: 'Tickets per Team',
+                  });
+                }
+              }}
+            />
             <KPIBarChart title="Avg Resolution Time per Team" data={data.avg_res_time_per_team} xKey="team" yKey="average_resolution_time_hours" />
           </div>
         )}

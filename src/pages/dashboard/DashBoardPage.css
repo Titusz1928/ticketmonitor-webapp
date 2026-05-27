@@ -131,6 +131,14 @@
   min-width: 160px;
 }
 
+.filter-group input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e0;
+  background-color: #f7fafc;
+  min-width: 160px;
+}
+
 .filter-group select:hover {
   border-color: #a0aec0;
 }
@@ -139,4 +147,49 @@
   outline: none;
   border-color: #3182ce;
   box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+.filter-group input:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+.data-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.drilldown-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  background: #eef3ff;
+  color: #1f2f63;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+
+.drilldown-chip button {
+  border: none;
+  background: transparent;
+  color: #0011ff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.empty-state {
+  margin: 0;
+  padding: 14px;
+  color: #4b5563;
+}
+
+.result-count {
+  margin: 6px 0 12px;
+  color: #4b5563;
+  font-size: 0.9rem;
 }

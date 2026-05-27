@@ -5,6 +5,7 @@ type BarChartProps<T extends object> = {
     data: T[];
     xKey: keyof T;
     yKey: keyof T;
+    onItemClick?: (item: T) => void;
 };
 
 function KPIBarChart<T extends object>({
@@ -12,6 +13,7 @@ function KPIBarChart<T extends object>({
     data,
     xKey, 
     yKey,
+    onItemClick,
 }: BarChartProps<T>) {
     return (
         <div className = "chart-card">
@@ -25,6 +27,12 @@ function KPIBarChart<T extends object>({
                         dataKey = {yKey as string}
                         fill="#0011ff" 
                         radius={[4, 4, 0, 0]} 
+                        onClick={(entry) => {
+                          if (onItemClick && entry && entry.payload) {
+                            onItemClick(entry.payload as T);
+                          }
+                        }}
+                        cursor={onItemClick ? 'pointer' : 'default'}
                     />
                     </BarChart>
                 </ResponsiveContainer>

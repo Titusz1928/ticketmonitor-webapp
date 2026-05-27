@@ -5,6 +5,7 @@ type DonutChartProps<T extends object> = {
     data: T[];
     nameKey: keyof T;
     dataKey: keyof T;
+    onItemClick?: (item: T) => void;
 };
 
 const COLORS = [
@@ -25,6 +26,7 @@ function KPIDonutChart<T extends object>( {
     data,
     nameKey,
     dataKey,
+    onItemClick,
  }: DonutChartProps<T>) {
     return (
         <div className="chart-card">
@@ -38,16 +40,36 @@ function KPIDonutChart<T extends object>( {
                       innerRadius={60}
                       outerRadius={80}
                       paddingAngle={5}
+                      onClick={(_, index) => {
+                        if (onItemClick && index >= 0 && data[index]) {
+                          onItemClick(data[index]);
+                        }
+                      }}
+                      style={{ cursor: onItemClick ? 'pointer' : 'default' }}
                     >
-                      {data.map((_, index) => (
+                      {data.map((item, index) => (
                         <Cell 
                             key={`${title}-cell-${index}`} 
                             fill={COLORS[index % COLORS.length]} 
+                            onClick={() => {
+                              if (onItemClick) {
+                                onItemClick(item);
+                              }
+                            }}
                         />
                       ))}
                     </Pie>
                     <Tooltip />
-                    <Legend />
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="bottom"
+                      wrapperStyle={{
+                        fontSize: '12px',
+                        lineHeight: '1.4',
+                        maxHeight: '70px',
+                        overflowY: 'auto',
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
         </div>
