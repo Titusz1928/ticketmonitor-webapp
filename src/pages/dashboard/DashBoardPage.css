@@ -155,6 +155,31 @@
   box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
 }
 
+/* Clear Action Button layout adjustments */
+.clear-filters-action-btn {
+  align-self: flex-end; /* Vertically aligns item with dropdowns, away from uppercase header text labels */
+  height: 38px; /* Perfectly matches height layout profile of adjacent native select boxes */
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e0;
+  color: #e53e3e; /* Standard accessible administrative warning red color tone */
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.clear-filters-action-btn:hover {
+  background-color: #fff5f5;
+  border-color: #fc8181;
+  box-shadow: 0 2px 4px rgba(229, 62, 62, 0.08);
+}
+
+.clear-filters-action-btn:active {
+  background-color: #fed7d7;
+}
+
 .data-section-header {
   display: flex;
   align-items: center;

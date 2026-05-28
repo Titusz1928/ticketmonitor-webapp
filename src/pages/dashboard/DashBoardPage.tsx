@@ -36,6 +36,19 @@ export const DashboardPage = () => {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleClearAllFilters = () => {
+    setFilters({
+      status: '',
+      priority: '',
+      team: '',
+      startDate: '',
+      endDate: '',
+    });
+    setChartSelection(null);
+  };
+
+  const hasActiveFilters = Object.values(filters).some((value) => value !== '');
+
   useEffect(() => {
     setLoading(true);
 
@@ -146,6 +159,17 @@ export const DashboardPage = () => {
               min={filters.startDate || undefined}
             />
           </div>
+
+          {hasActiveFilters && (
+            <button 
+              type="button" 
+              className="clear-filters-action-btn" 
+              onClick={handleClearAllFilters}
+            >
+              Clear Filters
+            </button>
+          )}
+          
         </section>
 
         <section className="analytics-section">

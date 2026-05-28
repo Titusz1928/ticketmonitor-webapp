@@ -44,4 +44,18 @@ export interface DashboardData {
   category_tier_1: CategoryKPI[];
   category_tier_2: CategoryKPI[];
   category_tier_3: CategoryKPI[];
+
+  sla_compliance: {
+    label: string;
+    value: number;
+    unit: string;
+    breakdown: {
+      in_sla: number;
+      out_sla: number;
+    };
+  };
+  sla_intervals: {
+    interval: string;
+    count: number;
+  }[];
 }
