@@ -2,91 +2,167 @@ import React from 'react';
 import './KPIFilterBar.css';
 
 export interface FiltersState {
-  status: string;
-  priority: string;
-  team: string;
+  status: string[];
+  priority: string[];
+  team: string[];
   startDate: string;
   endDate: string;
 }
 
+export interface FilterOptions {
+  statuses: string[];
+  priorities: string[];
+  teams: string[];
+}
+
+export type MultiFilterName = 'status' | 'priority' | 'team';
+
 interface KPIFilterBarProps {
   filters: FiltersState;
-  onFilterChange: (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => void;
+  filterOptions: FilterOptions;
+  onToggleFilter: (filterName: MultiFilterName, value: string) => void;
+  onDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClearFilters: () => void;
 }
 
-export const KPIFilterBar = ({ filters, onFilterChange, onClearFilters }: KPIFilterBarProps) => {
-  const hasActiveFilters = Object.values(filters).some((value) => value !== '');
+interface MultiSelectDropdownProps {
+  label: string;
+  filterName: MultiFilterName;
+  options: string[];
+  selectedValues: string[];
+  emptyText: string;
+  allText: string;
+  onToggleFilter: (filterName: MultiFilterName, value: string) => void;
+}
+
+const getDropdownText = (
+  selectedValues: string[],
+  allText: string
+) => {
+  if (selectedValues.length === 0) {
+    return allText;
+  }
+
+  if (selectedValues.length <= 2) {
+    return selectedValues.join(', ');
+  }
+
+  return `${selectedValues.length} selected`;
+};
+
+const MultiSelectDropdown = ({
+  label,
+  filterName,
+  options,
+  selectedValues,
+  emptyText,
+  allText,
+  onToggleFilter,
+}: MultiSelectDropdownProps) => {
+  return (
+    <div className="filter-group dropdown-filter-group">
+      <label>{label}</label>
+
+      <div className="multi-select-dropdown">
+        <button type="button" className="multi-select-button">
+          <span className="multi-select-button-text">
+            {getDropdownText(selectedValues, allText)}
+          </span>
+          <span className="multi-select-arrow">▾</span>
+        </button>
+
+        <div className="multi-select-menu">
+          {options.length > 0 ? (
+            options.map((option) => (
+              <label key={option} className="multi-select-option">
+                <input
+                  type="checkbox"
+                  checked={selectedValues.includes(option)}
+                  onChange={() => onToggleFilter(filterName, option)}
+                />
+                <span>{option}</span>
+              </label>
+            ))
+          ) : (
+            <span className="filter-empty-state">{emptyText}</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const KPIFilterBar = ({
+  filters,
+  filterOptions,
+  onToggleFilter,
+  onDateChange,
+  onClearFilters
+}: KPIFilterBarProps) => {
+  const hasActiveFilters =
+    filters.status.length > 0 ||
+    filters.priority.length > 0 ||
+    filters.team.length > 0 ||
+    filters.startDate !== '' ||
+    filters.endDate !== '';
 
   return (
     <section className="filter-bar">
-      <div className="filter-group">
-        <label>Status</label>
-        <select name="status" value={filters.status} onChange={onFilterChange}>
-          <option value="">All Statuses</option>
-          <option value="Open">Open</option>
-          <option value="Pending">Pending</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Resolved">Resolved</option>
-          <option value="Closed">Closed</option>
-        </select>
-      </div>
+      <MultiSelectDropdown
+        label="Status"
+        filterName="status"
+        options={filterOptions.statuses}
+        selectedValues={filters.status}
+        allText="All Statuses"
+        emptyText="No statuses available"
+        onToggleFilter={onToggleFilter}
+      />
 
-      <div className="filter-group">
-        <label>Priority</label>
-        <select name="priority" value={filters.priority} onChange={onFilterChange}>
-          <option value="">All Priorities</option>
-          <option value="Critical">Critical</option>
-          <option value="High">High</option>
-          <option value="Medium">Medium</option>
-          <option value="Low">Low</option>
-        </select>
-      </div>
+      <MultiSelectDropdown
+        label="Priority"
+        filterName="priority"
+        options={filterOptions.priorities}
+        selectedValues={filters.priority}
+        allText="All Priorities"
+        emptyText="No priorities available"
+        onToggleFilter={onToggleFilter}
+      />
 
-      <div className="filter-group">
-        <label>Team</label>
-        <select name="team" value={filters.team} onChange={onFilterChange}>
-          <option value="">All Teams</option>
-          <option value="Core Network">Core Network</option>
-          <option value="Radio Access Network (RAN)">Radio Access (RAN)</option>
-          <option value="Fiber Operations">Fiber Operations</option>
-          <option value="Transmission">Transmission</option>
-          <option value="Hardware">Hardware</option>
-          <option value="Cloud Infrastructure">Cloud Infrastructure</option>
-          <option value="Security">Security</option>
-          <option value="NOC">NOC</option>
-          <option value="OSS BSS">OSS BSS</option>
-          <option value="Field Operations">Field Operations</option>
-          <option value="QA Testing">QA Testing</option>
-          <option value="Communications">Communications</option>
-        </select>
-      </div>
+      <MultiSelectDropdown
+        label="Team"
+        filterName="team"
+        options={filterOptions.teams}
+        selectedValues={filters.team}
+        allText="All Teams"
+        emptyText="No teams available"
+        onToggleFilter={onToggleFilter}
+      />
 
-      <div className="filter-group">
+      <div className="filter-group date-filter-group">
         <label>Start Date</label>
         <input
           type="date"
           name="startDate"
           value={filters.startDate}
-          onChange={onFilterChange}
+          onChange={onDateChange}
         />
       </div>
 
-      <div className="filter-group">
+      <div className="filter-group date-filter-group">
         <label>End Date</label>
         <input
           type="date"
           name="endDate"
           value={filters.endDate}
-          onChange={onFilterChange}
+          onChange={onDateChange}
           min={filters.startDate || undefined}
         />
       </div>
 
       {hasActiveFilters && (
-        <button 
-          type="button" 
-          className="clear-filters-action-btn" 
+        <button
+          type="button"
+          className="clear-filters-action-btn"
           onClick={onClearFilters}
         >
           Clear Filters

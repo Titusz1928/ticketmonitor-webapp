@@ -7,33 +7,35 @@
   align-items: center;
   /* CHANGED: Allows items to break to a new line instead of breaking the container */
   flex-wrap: wrap; 
-  gap: 16px; /* Tightened gap slightly for better handling on smaller screens */
-  padding: 20px;
+  gap: 20px; /* Tightened gap slightly for better handling on smaller screens */
+  padding: 24px 26px;
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 4px;
+  overflow: visible;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   /* NEW: Forces the filter items to grow and shrink dynamically together */
   flex: 1;
   /* NEW: Keeps the fields from becoming awkwardly wide on giant viewports */
-  max-width: 220px; 
+  max-width: 280px; 
   /* NEW: Ensures date pickers and dropdown text remain readable at minimum sizes */
-  min-width: 120px; 
+  min-width: 210px; 
+  position: relative;
 }
 
 .filter-group label {
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #4a5568;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
 }
 
 .filter-group select,
@@ -60,4 +62,172 @@
   outline: none;
   border-color: #3182ce;
   box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+.dropdown-filter-group {
+  flex: 0 1 auto;
+}
+
+.date-filter-group {
+  min-width: 210px;
+}
+
+.filter-group input[type='date'] {
+  height: 44px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e0;
+  background-color: #f7fafc;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 0.95rem;
+}
+
+.filter-group input[type='date']:focus {
+  outline: none;
+  border-color: #0065ff;
+  box-shadow: 0 0 0 3px rgba(0, 101, 255, 0.15);
+}
+
+.multi-select-dropdown {
+  position: relative;
+  width: fit-content;
+  min-width: 210px;
+  max-width: 360px;
+}
+
+.multi-select-button {
+  min-height: 44px;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  background-color: #f7fafc;
+  color: #1e293b;
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.multi-select-button:hover {
+  border-color: #94a3b8;
+  background-color: #ffffff;
+}
+
+.multi-select-button-text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 290px;
+}
+
+.multi-select-arrow {
+  color: #0065ff;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.multi-select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 1000;
+  min-width: 100%;
+  width: max-content;
+  max-width: 360px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid #cbd5e0;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+  display: none;
+}
+
+.multi-select-dropdown:hover .multi-select-menu,
+.multi-select-dropdown:focus-within .multi-select-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.multi-select-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: #1e293b;
+  font-size: 0.92rem;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.multi-select-option:hover {
+  background-color: #f1f5f9;
+}
+
+.multi-select-option input {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: #0065ff;
+  flex-shrink: 0;
+}
+
+.filter-empty-state {
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.clear-filters-action-btn {
+  height: 44px;
+  align-self: flex-end;
+  padding: 0 16px;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.clear-filters-action-btn:hover {
+  background-color: #eef2ff;
+  border-color: #0065ff;
+  color: #0065ff;
+}
+
+@media (max-width: 900px) {
+  .filter-bar {
+    align-items: stretch;
+  }
+
+  .filter-group,
+  .multi-select-dropdown,
+  .date-filter-group {
+    width: 100%;
+    max-width: none;
+  }
+
+  .multi-select-button {
+    max-width: none;
+  }
+
+  .multi-select-menu {
+    width: 100%;
+    max-width: none;
+  }
 }

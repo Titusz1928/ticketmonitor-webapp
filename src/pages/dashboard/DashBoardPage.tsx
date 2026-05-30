@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Header } from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import { KpiDashboard } from '../../components/KPIDashBoard/KPIDashBoard';
-import { KPIFilterBar, type FiltersState } from '../../components/KPIFilterBar/KPIFilterBar';
+import {
+  KPIFilterBar,
+  type FiltersState,
+  type FilterOptions,
+  type MultiFilterName
+} from '../../components/KPIFilterBar/KPIFilterBar';
 import type { Ticket } from '../../types/Ticket';
 import './DashBoardPage.css';
 
@@ -15,9 +20,9 @@ export const DashboardPage = () => {
   const [isControlsExpanded, setIsControlsExpanded] = useState<boolean>(true);
 
   const [filters, setFilters] = useState<FiltersState>({
-    status: '',
-    priority: '',
-    team: '',
+    status: [],
+    priority: [],
+    team: [],
     startDate: '',
     endDate: '',
   });
@@ -28,16 +33,59 @@ export const DashboardPage = () => {
     source: string;
   } | null>(null);
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+    statuses: [],
+    priorities: [],
+    teams: [],
+  });
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/kpi/filters')
+      .then((response) => response.json())
+      .then((data) => {
+        setFilterOptions({
+          statuses: data.statuses ?? [],
+          priorities: data.priorities ?? [],
+          teams: data.teams ?? [],
+        });
+      })
+      .catch((error) => {
+        console.error('Error fetching filter options:', error);
+      });
+  }, []);
+
+  const handleToggleFilter = (filterName: MultiFilterName, value: string) => {
+    setFilters((prev) => { 
+      const currentValues = prev[filterName];
+
+      const nextValues = currentValues.includes(value) 
+        ? currentValues.filter((item) => item !== value)
+        : [...currentValues, value];
+
+      return {
+        ...prev, [filterName]: nextValues,
+      };
+     });
+
+     setChartSelection(null);
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setChartSelection(null);
   };
 
   const handleClearAllFilters = () => {
     setFilters({
-      status: '',
-      priority: '',
-      team: '',
+      status: [],
+      priority: [],
+      team: [],
       startDate: '',
       endDate: '',
     });
@@ -48,9 +96,18 @@ export const DashboardPage = () => {
     setLoading(true);
 
     const params = new URLSearchParams();
-    if (filters.status) params.append('status', filters.status);
-    if (filters.priority) params.append('priority', filters.priority);
-    if (filters.team) params.append('team', filters.team);
+    filters.status.forEach((status) => {
+      params.append('status', status);
+    });
+
+    filters.priority.forEach((priority) => {
+      params.append('priority', priority);
+    });
+
+    filters.team.forEach((team) => {
+      params.append('team', team);
+    });
+
     if (filters.startDate) params.append('startDate', filters.startDate);
     if (filters.endDate) params.append('endDate', filters.endDate);
 
@@ -100,12 +157,13 @@ export const DashboardPage = () => {
 
         {/* NEW: Conditional Outer Accordion Section Wrapper */}
         <div className={`collapsible-drawer-content ${isControlsExpanded ? 'expanded' : 'collapsed'}`}>
-          <KPIFilterBar 
-            filters={filters} 
-            onFilterChange={handleFilterChange} 
-            onClearFilters={handleClearAllFilters} 
+          <KPIFilterBar
+            filters={filters}
+            filterOptions={filterOptions}
+            onToggleFilter={handleToggleFilter}
+            onDateChange={handleDateChange}
+            onClearFilters={handleClearAllFilters}
           />
-
           <section className="analytics-section">
             <KpiDashboard filters={filters} onChartSelection={setChartSelection} />
           </section>

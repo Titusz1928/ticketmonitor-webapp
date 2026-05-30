@@ -7,13 +7,14 @@ import './KPIDashBoard.css';
 
 interface KpiDashboardProps {
   filters: {
-    status?: string;
-    priority?: string;
-    team?: string;
+    status: string[];
+    priority: string[];
+    team: string[];
     assigned_person?: string;
     startDate?: string;
     endDate?: string;
   };
+
   onChartSelection?: (selection: {
     key: 'STATUS' | 'PRIORITY' | 'TEAM' | 'CATEGORY_TIER_1' | 'CATEGORY_TIER_2' | 'CATEGORY_TIER_3';
     value: string;
@@ -34,9 +35,18 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
     setData(null); 
     
     const params = new URLSearchParams();
-    if (filters.status) params.append('status', filters.status);
-    if (filters.priority) params.append('priority', filters.priority);
-    if (filters.team) params.append('team', filters.team);
+    filters.status.forEach((status) => {
+      params.append('status', status);
+    });
+
+    filters.priority.forEach((priority) => {
+      params.append('priority', priority);
+    });
+
+    filters.team.forEach((team) => {
+      params.append('team', team);
+    });
+
     if (filters.startDate) params.append('startDate', filters.startDate);
     if (filters.endDate) params.append('endDate', filters.endDate);
 
