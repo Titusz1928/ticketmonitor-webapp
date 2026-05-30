@@ -1,0 +1,46 @@
+/* Card Container Box */
+.stat-card {
+  background: #ffffff;
+  margin: 0;     
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem; 
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  /* CHANGED: Swapped from fixed height to min-height */
+  min-height: 4.5rem; 
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Card Title Element specifically */
+.stat-card h3 {
+  /* NEW: Dynamically shrinks from 11px down to 9px if container gets too tight */
+  font-size: clamp(9px, 0.8vw, 11px) !important;   
+  font-weight: 500 !important;
+  color: #64748b !important;
+  
+  /* NEW: Safe handling for long titles (allows 2 lines maximum, hides overflow) */
+  margin: 0 !important;
+  padding: 0 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  line-height: 1.2 !important;
+}
+
+/* Stat Value Output text specifically */
+.stat-card .stat-value {
+  font-size: 16px !important;   
+  font-weight: 700 !important;
+  color: #007bff !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  
+  /* NEW: Ensures value aligns cleanly to the bottom baseline */
+  margin-top: auto !important; 
+}

@@ -1,0 +1,63 @@
+/* ==========================================================================
+   UPDATED RESPONSIVE FILTER BAR
+   ========================================================================== */
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  /* CHANGED: Allows items to break to a new line instead of breaking the container */
+  flex-wrap: wrap; 
+  gap: 16px; /* Tightened gap slightly for better handling on smaller screens */
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 4px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* NEW: Forces the filter items to grow and shrink dynamically together */
+  flex: 1;
+  /* NEW: Keeps the fields from becoming awkwardly wide on giant viewports */
+  max-width: 220px; 
+  /* NEW: Ensures date pickers and dropdown text remain readable at minimum sizes */
+  min-width: 120px; 
+}
+
+.filter-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-group select,
+.filter-group input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e0;
+  background-color: #f7fafc;
+  width: 100%; /* NEW: Tells the element to fill 100% of its fluid parent wrapper */
+  box-sizing: border-box;
+}
+
+.filter-group select {
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-group select:hover {
+  border-color: #a0aec0;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}

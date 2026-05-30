@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { DashboardData } from '../../types/KPI';
-import KPICard from './KPICard.tsx';
-import KPIDonutChart from './KPIDonutChart.tsx';
-import KPIBarChart from './KPIBarChart.tsx';
+import KPICard from './KPICard/KPICard.tsx';
+import KPIDonutChart from './KPIDonutChart/KPIDonutChart.tsx';
+import KPIBarChart from './KPIBarChart/KPIBarChart.tsx';
 import './KPIDashBoard.css';
 
 interface KpiDashboardProps {
@@ -50,10 +50,20 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
       });
   }, [filters]);
 
-  if (!data) return <p>Updating Analytics...</p>;
+  // REMOVED: Early return clause that was unmounting the whole component tree
 
   return (
-    <div className="kpi-dashboard-container">
+    /* We append 'is-loading' when data is null to let CSS smoothly dim/freeze the dashboard sections */
+    <div className={`kpi-dashboard-container ${!data ? 'is-loading' : ''}`}>
+      
+      {/* Dynamic Global Progress Loading Bar Overlay */}
+      {/* {!data && (
+        <div className="dashboard-loading-overlay">
+          <div className="spinner"></div>
+          <span>Updating Analytics...</span>
+        </div>
+      )} */}
+
       {/* Tab Navigation reverted to clean standalone layout */}
       <div className="tabs">
         {(['all', 'overview', 'sla', 'categories', 'teams'] as TabType[]).map((tab) => (
@@ -72,17 +82,17 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
         {(activeTab === 'all' || activeTab === 'overview') && (
           <div className="dashboard-section">
             {activeTab === 'all' && <h3 className="section-divider-title">Core Performance Metrics</h3>}
-            <div className="stat-card">
-              <KPICard kpi={data.total_tickets} />
-              <KPICard kpi={data.avg_res_time} />
-              <KPICard kpi={data.unresolved_tickets} />
-              <KPICard kpi={data.resolved_tickets} />
-              <KPICard kpi={data.overdue_tickets} />
+            <div className="stat-cards-grid">
+              <KPICard kpi={data?.total_tickets ?? { label: "Total Tickets", value: "...", unit: "" }} />
+              <KPICard kpi={data?.avg_res_time ?? { label: "Avg Resolution Time", value: "...", unit: "" }} />
+              <KPICard kpi={data?.unresolved_tickets ?? { label: "Unresolved Tickets", value: "...", unit: "" }} />
+              <KPICard kpi={data?.resolved_tickets ?? { label: "Resolved Tickets", value: "...", unit: "" }} />
+              <KPICard kpi={data?.overdue_tickets ?? { label: "Overdue Tickets", value: "...", unit: "" }} />
             </div>
-            <div className="chart-card">
+            <div className="charts-layout-grid">
               <KPIDonutChart
                 title="Tickets by Status"
-                data={data.tickets_by_status}
+                data={data?.tickets_by_status ?? []}
                 nameKey="status"
                 dataKey="count"
                 onItemClick={(item) => {
@@ -97,7 +107,7 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
               />
               <KPIBarChart
                 title="Tickets by Priority"
-                data={data.tickets_by_priority}
+                data={data?.tickets_by_priority ?? []}
                 xKey="priority"
                 yKey="count"
                 onItemClick={(item) => {
@@ -118,34 +128,34 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
         {(activeTab === 'all' || activeTab === 'sla') && (
           <div className="dashboard-section">
             {activeTab === 'all' && <h3 className="section-divider-title">SLA Compliance & Targets</h3>}
-            <div className="stat-card sla-highlight">
-              <KPICard kpi={data.sla_compliance} />
+            <div className="stat-cards-grid">
+              <KPICard kpi={data?.sla_compliance ?? { label: "SLA Compliance", value: "...", unit: "%" }} />
               <KPICard kpi={{ 
                 label: "Tickets in SLA", 
-                value: data.sla_compliance.breakdown.in_sla, 
+                value: data?.sla_compliance?.breakdown?.in_sla ?? "...", 
                 unit: "" 
               }} />
               <KPICard kpi={{ 
                 label: "Tickets Breached", 
-                value: data.sla_compliance.breakdown.out_sla, 
+                value: data?.sla_compliance?.breakdown?.out_sla ?? "...", 
                 unit: "" 
               }} />
             </div>
 
-            <div className="chart-card">
+            <div className="charts-layout-grid">
               <KPIDonutChart
                 title="SLA Status Breakdown"
-                data={[
+                data={data ? [
                   { label: 'In SLA', value: data.sla_compliance.breakdown.in_sla },
                   { label: 'Out of SLA', value: data.sla_compliance.breakdown.out_sla }
-                ]}
+                ] : []}
                 nameKey="label"
                 dataKey="value"
                 customColors={['#28a745', '#dc3545']}
               />
               <KPIBarChart
                 title="Resolution Time Distribution"
-                data={data.sla_intervals}
+                data={data?.sla_intervals ?? []}
                 xKey="interval"
                 yKey="count"
               />
@@ -157,10 +167,10 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
         {(activeTab === 'all' || activeTab === 'categories') && (
           <div className="dashboard-section">
             {activeTab === 'all' && <h3 className="section-divider-title">Categorization Breakdown</h3>}
-            <div className="chart-card tier-charts">
+            <div className="charts-layout-grid tier-charts">
               <KPIDonutChart
                 title="Category Tier 1"
-                data={data.category_tier_1}
+                data={data?.category_tier_1 ?? []}
                 nameKey="category"
                 dataKey="count"
                 onItemClick={(item) => {
@@ -211,10 +221,10 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
         {(activeTab === 'all' || activeTab === 'teams') && (
           <div className="dashboard-section">
             {activeTab === 'all' && <h3 className="section-divider-title">Operational Team Performance</h3>}
-            <div className="chart-card">
+            <div className="charts-layout-grid">
               <KPIBarChart
                 title="Tickets per Team"
-                data={data.tickets_per_team}
+                data={data?.tickets_per_team ?? []}
                 xKey="team"
                 yKey="count"
                 onItemClick={(item) => {
@@ -227,7 +237,7 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
                   }
                 }}
               />
-              <KPIBarChart title="Avg Resolution Time per Team" data={data.avg_res_time_per_team} xKey="team" yKey="average_resolution_time_hours" />
+              <KPIBarChart title="Avg Resolution Time per Team" data={data?.avg_res_time_per_team ?? []} xKey="team" yKey="average_resolution_time_hours" />
             </div>
           </div>
         )}

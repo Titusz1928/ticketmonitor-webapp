@@ -1,0 +1,27 @@
+/* Isolated Chart Container Box */
+.chart-card {
+  background: #ffffff;
+  margin: 0 0 0 0;    /* Top, Right, Bottom (0.75rem), Left */
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.85rem 1rem; 
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Shrunk Chart Component Title Section */
+.chart-card h3 {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  margin: 0 0 10px 0 !important; 
+  padding: 0 !important;
+}
+
+/* Chart SVG Subcomponents */
+.chart-card .recharts-wrapper {
+  font-size: 10px !important; 
+}
+
+.chart-card .recharts-cartesian-axis-tick-value {
+  font-size: 9px !important;  
+}

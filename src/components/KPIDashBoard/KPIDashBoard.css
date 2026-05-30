@@ -8,7 +8,6 @@
 .tabs {
   display: flex;
   gap: 12px;
-  margin-bottom: 24px;
   border-bottom: 2px solid #e2e8f0;
   padding-bottom: 8px;
 }
@@ -47,8 +46,9 @@
 .dashboard-section {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.75rem;
   width: 100%;
+  /*outline: 1px solid #007bff*/
 }
 
 .section-divider-title {
@@ -62,39 +62,81 @@
   margin: 1rem 0 0 0;
 }
 
-/* Numerical Card Row Grid Arrangement */
-.stat-card {
+/* Card Row Grids Base (Enforced 2-Column Base) */
+.stat-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(6, 1fr); /* 6 micro-columns for maximum flexibility */
+  grid-auto-rows: auto;
+  gap: 0.75rem;
   width: 100%;
 }
 
-/* Chart Card Row Layouts Layout positioning */
-.chart-card {
+/* Default state: Every card spans 2 micro-columns (Results in 3 cards per row) */
+.stat-cards-grid > * {
+  grid-column: span 2;
+}
+
+/* ==========================================================================
+   DYNAMIC QUANTITY QUERY ENGINE (The 6-Column Method)
+   ========================================================================== */
+
+/* CASE 1: Exactly 1 Card */
+/* Stretches full width (span 6) and doubles its height */
+.stat-cards-grid:has(> :last-child:nth-child(1)) > * {
+  grid-column: span 6;
+  height: calc(9rem + 0.75rem); 
+}
+
+/* CASE 2: Exactly 2 Cards (1 Row: 2+0) */
+/* Both items take 50% width (span 3) */
+.stat-cards-grid:has(> :last-child:nth-child(2)) > * {
+  grid-column: span 3;
+}
+
+/* CASE 3: Exactly 3 Cards (2 Rows: 2+1) */
+/* Cards 1 & 2 take 50%. Card 3 takes 100%. */
+.stat-cards-grid:has(> :last-child:nth-child(3)) > :nth-child(-n+2) {
+  grid-column: span 3;
+}
+.stat-cards-grid:has(> :last-child:nth-child(3)) > :nth-child(3) {
+  grid-column: span 6;
+}
+
+/* CASE 4: Exactly 4 Cards (2 Rows: 2+2) */
+/* All cards take 50% width */
+.stat-cards-grid:has(> :last-child:nth-child(4)) > * {
+  grid-column: span 3;
+}
+
+/* CASE 5: Exactly 5 Cards (2 Rows: 3+2) */
+/* Cards 1-3 stay default (33%). Cards 4 & 5 take 50%. */
+.stat-cards-grid:has(> :last-child:nth-child(5)) > :nth-child(n+4) {
+  grid-column: span 3;
+}
+
+/* CASE 6: Exactly 6 Cards (2 Rows: 3+3) */
+/* Handled automatically by the default span 2! (No rule needed) */
+
+/* CASE 7: Exactly 7 Cards (3 Rows: 3+2+2) */
+/* Cards 1-3 stay default (33%). Cards 4 through 7 take 50%. */
+.stat-cards-grid:has(> :last-child:nth-child(7)) > :nth-child(n+4) {
+  grid-column: span 3;
+}
+
+/* CASE 8: Exactly 8 Cards (3 Rows: 3+3+2) */
+/* Cards 1-6 stay default (33%). Cards 7 & 8 take 50%. */
+.stat-cards-grid:has(> :last-child:nth-child(8)) > :nth-child(n+7) {
+  grid-column: span 3;
+}
+
+/* Chart Row Grid Layout (Layout Positioning Only) */
+.charts-layout-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  gap: 0.75rem;
   width: 100%;
 }
 
-/* Handles 3 items gracefully in Category view */
-.chart-card.tier-charts {
+.charts-layout-grid.tier-charts {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-
-/* Chart SVG Subcomponents */
-.kpi-dashboard-container .recharts-wrapper {
-  font-size: 12px;
-}
-
-.kpi-dashboard-container .recharts-cartesian-axis-tick-value {
-  font-size: 11px;
-}
-
-/* SLA Metric Custom Branding Styling Rules */
-.sla-highlight .kpi-card-container {
-  border-left: 5px solid #28a745 !important;
-  background-color: #f8fff9 !important;
-  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.06);
 }
