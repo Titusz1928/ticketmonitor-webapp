@@ -7,19 +7,19 @@ type DonutChartProps<T extends object> = {
     nameKey: keyof T;
     dataKey: keyof T;
     onItemClick?: (item: T) => void;
+    customColors?: string[];
 };
 
 const COLORS = [
-    '#0011ff', 
-    '#00e5ff', 
-    '#ffbb28', 
-    '#ff8042', 
-    '#000000',
-    "#7c3aed",
-    "#16a34a",
-    "#dc2626",
-    "#0891b2",
-    "#9333ea",
+    '#2563eb',
+    '#4f86f7',
+    '#38bdf8',
+    '#0b1d4f',
+    '#16a34a',
+    '#0369a1',
+    '#b45309',
+    '#475569',
+    '#dc2626',
 ];
 
 function KPIDonutChart<T extends object>( {
@@ -28,7 +28,9 @@ function KPIDonutChart<T extends object>( {
     nameKey,
     dataKey,
     onItemClick,
+    customColors,
  }: DonutChartProps<T>) {
+    const palette = customColors ?? COLORS;
     return (
         <div className="chart-card donut-card-wrapper">
             <h3> {title} </h3>
@@ -56,7 +58,7 @@ function KPIDonutChart<T extends object>( {
                   {data.map((item, index) => (
                     <Cell 
                         key={`${title}-cell-${index}`} 
-                        fill={COLORS[index % COLORS.length]} 
+                        fill={palette[index % palette.length]} 
                         onClick={() => {
                           if (onItemClick) {
                             onItemClick(item);

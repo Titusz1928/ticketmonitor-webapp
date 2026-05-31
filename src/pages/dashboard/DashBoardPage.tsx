@@ -203,20 +203,28 @@ export const DashboardPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredTickets.map((ticket) => (
-                    <tr key={ticket.TICKET_NUMBER}>
-                      <td className="bold-blue">{ticket.TICKET_NUMBER}</td>
+                  {filteredTickets.map((ticket) => {
+                    const statusClass = ticket.STATUS?.toLowerCase().replace(/\s+/g, '-') ?? 'unknown';
+                    const isCritical = ticket.PRIORITY === 'Critical';
+
+                    return (
+                    <tr
+                      key={ticket.TICKET_NUMBER}
+                      className={isCritical ? 'row-critical' : undefined}
+                    >
+                      <td className="ticket-id">{ticket.TICKET_NUMBER}</td>
                       <td>
-                        <span className={`status-badge ${ticket.STATUS?.toLowerCase() || 'unknown'}`}>
+                        <span className={`status-badge ${statusClass}`}>
                           {ticket.STATUS}
                         </span>
                       </td>
-                      <td>{ticket.PRIORITY}</td>
+                      <td className={isCritical ? 'priority-critical' : undefined}>{ticket.PRIORITY}</td>
                       <td>{ticket.SERVICE}</td>
                       <td>{ticket.ASSIGNED_PERSON}</td>
-                      <td>{new Date(ticket.SUBMIT_DATETIME).toLocaleDateString()}</td>
+                      <td className="ticket-date">{new Date(ticket.SUBMIT_DATETIME).toLocaleDateString()}</td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
               {!filteredTickets.length && (

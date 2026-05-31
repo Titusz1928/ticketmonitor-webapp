@@ -1,27 +1,40 @@
-/* Isolated Chart Container Box */
 .chart-card {
-  background: #ffffff;
-  margin: 0 0 0 0;    /* Top, Right, Bottom (0.75rem), Left */
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 0.85rem 1rem; 
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  background: var(--color-surface);
+  margin: 0;
+  border: var(--border-panel);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
+  box-shadow: var(--shadow-card);
+  width: 100%;
+  min-width: 0;
 }
 
-/* Shrunk Chart Component Title Section */
-.chart-card h3 {
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  color: #334155 !important;
-  margin: 0 0 10px 0 !important; 
-  padding: 0 !important;
+.donut-card-wrapper h3 {
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+  font-weight: 500 !important;
+  color: var(--color-text-muted) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.375rem 0 !important;
+  padding: 0 0 0.375rem 0 !important;
+  border-bottom: var(--border-panel);
 }
 
-/* Chart SVG Subcomponents */
 .chart-card .recharts-wrapper {
-  font-size: 10px !important; 
+  font-family: var(--font-mono);
+  font-size: 0.625rem !important;
 }
 
-.chart-card .recharts-cartesian-axis-tick-value {
-  font-size: 9px !important;  
+.chart-card .recharts-legend-item-text {
+  color: var(--color-text-body) !important;
+  font-size: 0.625rem !important;
+}
+
+.chart-card .recharts-default-tooltip {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  border: var(--border-panel) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-card) !important;
 }

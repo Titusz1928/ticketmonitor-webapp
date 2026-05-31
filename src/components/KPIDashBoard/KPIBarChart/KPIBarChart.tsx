@@ -26,7 +26,7 @@ function KPIBarChart<T extends object>({
                     <Tooltip />
                     <Bar 
                         dataKey = {yKey as string}
-                        fill="#0011ff" 
+                        fill="#2563eb" 
                         radius={[4, 4, 0, 0]} 
                         onClick={(entry) => {
                           if (onItemClick && entry && entry.payload) {

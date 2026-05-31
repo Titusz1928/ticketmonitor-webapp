@@ -1,46 +1,53 @@
-/* Card Container Box */
 .stat-card {
-  background: #ffffff;
-  margin: 0;     
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 0.3rem 0.5rem; 
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-
-  /* CHANGED: Swapped from fixed height to min-height */
-  min-height: 4.5rem; 
+  background: var(--color-surface);
+  margin: 0;
+  border: var(--border-panel);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.65rem;
+  box-shadow: var(--shadow-card);
+  min-height: 3.25rem;
+  width: 100%;
   box-sizing: border-box;
-
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
+  transition: box-shadow 0.15s ease;
 }
 
-/* Card Title Element specifically */
+.stat-card:hover {
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08);
+}
+
 .stat-card h3 {
-  /* NEW: Dynamically shrinks from 11px down to 9px if container gets too tight */
-  font-size: clamp(9px, 0.8vw, 11px) !important;   
+  font-family: var(--font-mono) !important;
+  font-size: clamp(0.5625rem, 0.75vw, 0.6875rem) !important;
   font-weight: 500 !important;
-  color: #64748b !important;
-  
-  /* NEW: Safe handling for long titles (allows 2 lines maximum, hides overflow) */
+  color: var(--color-text-muted) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   margin: 0 !important;
   padding: 0 !important;
+  flex: 1;
+  min-width: 0;
   display: -webkit-box !important;
   -webkit-line-clamp: 2 !important;
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
-  line-height: 1.2 !important;
+  line-height: 1.3 !important;
+  text-align: left;
 }
 
-/* Stat Value Output text specifically */
 .stat-card .stat-value {
-  font-size: 16px !important;   
+  font-family: var(--font-display) !important;
+  font-size: 1rem !important;
   font-weight: 700 !important;
-  color: #007bff !important;
+  color: var(--color-text-heading) !important;
   margin: 0 !important;
   padding: 0 !important;
-  
-  /* NEW: Ensures value aligns cleanly to the bottom baseline */
-  margin-top: auto !important; 
+  flex-shrink: 0;
+  line-height: 1.1 !important;
+  text-align: right;
+  white-space: nowrap;
 }

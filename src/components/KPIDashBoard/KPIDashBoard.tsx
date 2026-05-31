@@ -161,7 +161,7 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
                 ] : []}
                 nameKey="label"
                 dataKey="value"
-                customColors={['#28a745', '#dc3545']}
+                customColors={['#16a34a', '#dc2626']}
               />
               <KPIBarChart
                 title="Resolution Time Distribution"
