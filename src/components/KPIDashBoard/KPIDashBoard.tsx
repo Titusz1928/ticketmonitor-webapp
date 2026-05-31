@@ -16,7 +16,7 @@ interface KpiDashboardProps {
   };
 
   onChartSelection?: (selection: {
-    key: 'STATUS' | 'PRIORITY' | 'TEAM' | 'CATEGORY_TIER_1' | 'CATEGORY_TIER_2' | 'CATEGORY_TIER_3';
+    key: 'STATUS' | 'PRIORITY' | 'TEAM' | 'CATEGORY_TIER_1' | 'CATEGORY_TIER_2' | 'CATEGORY_TIER_3' | 'SLA_STATUS' | 'SLA_INTERVAL';
     value: string;
     source: string;
   } | null) => void;
@@ -32,8 +32,8 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
   const topCategoryTier3 = (data?.category_tier_3 ?? []).slice(0, 10);
 
   useEffect(() => {
-    setData(null); 
-    
+    setData(null);
+
     const params = new URLSearchParams();
     filters.status.forEach((status) => {
       params.append('status', status);
@@ -65,7 +65,7 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
   return (
     /* We append 'is-loading' when data is null to let CSS smoothly dim/freeze the dashboard sections */
     <div className={`kpi-dashboard-container ${!data ? 'is-loading' : ''}`}>
-      
+
       {/* Dynamic Global Progress Loading Bar Overlay */}
       {/* {!data && (
         <div className="dashboard-loading-overlay">
@@ -140,15 +140,15 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
             {activeTab === 'all' && <h3 className="section-divider-title">SLA Compliance & Targets</h3>}
             <div className="stat-cards-grid">
               <KPICard kpi={data?.sla_compliance ?? { label: "SLA Compliance", value: "...", unit: "%" }} />
-              <KPICard kpi={{ 
-                label: "Tickets in SLA", 
-                value: data?.sla_compliance?.breakdown?.in_sla ?? "...", 
-                unit: "" 
+              <KPICard kpi={{
+                label: "Tickets in SLA",
+                value: data?.sla_compliance?.breakdown?.in_sla ?? "...",
+                unit: ""
               }} />
-              <KPICard kpi={{ 
-                label: "Tickets Breached", 
-                value: data?.sla_compliance?.breakdown?.out_sla ?? "...", 
-                unit: "" 
+              <KPICard kpi={{
+                label: "Tickets Breached",
+                value: data?.sla_compliance?.breakdown?.out_sla ?? "...",
+                unit: ""
               }} />
             </div>
 
@@ -162,12 +162,32 @@ export const KpiDashboard = ({ filters, onChartSelection }: KpiDashboardProps) =
                 nameKey="label"
                 dataKey="value"
                 customColors={['#16a34a', '#dc2626']}
+                // ADDED: Callback engine targets the new 'SLA_STATUS' key
+                onItemClick={(item) => {
+                  if (onChartSelection) {
+                    onChartSelection({
+                      key: 'SLA_STATUS',
+                      value: item.label, // Returns either 'In SLA' or 'Out of SLA'
+                      source: 'SLA Status Breakdown',
+                    });
+                  }
+                }}
               />
               <KPIBarChart
                 title="Resolution Time Distribution"
                 data={data?.sla_intervals ?? []}
                 xKey="interval"
                 yKey="count"
+                // ADDED: Callback drill-down connector triggers on click
+                onItemClick={(item) => {
+                  if (onChartSelection) {
+                    onChartSelection({
+                      key: 'SLA_INTERVAL',
+                      value: item.interval, // Automatically extracts context like "Sub 2h" or "2h - 4h"
+                      source: 'Resolution Time Distribution',
+                    });
+                  }
+                }}
               />
             </div>
           </div>

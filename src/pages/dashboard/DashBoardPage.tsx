@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Header } from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import { KpiDashboard } from '../../components/KPIDashBoard/KPIDashBoard';
+import { KPICollapsibleDrawer } from '../../components/KPICollapsibleDrawer/KPICollapsibleDrawer';
 import {
   KPIFilterBar,
   type FiltersState,
@@ -26,9 +27,9 @@ export const DashboardPage = () => {
     startDate: '',
     endDate: '',
   });
-  
+
   const [chartSelection, setChartSelection] = useState<{
-    key: 'STATUS' | 'PRIORITY' | 'TEAM' | 'CATEGORY_TIER_1' | 'CATEGORY_TIER_2' | 'CATEGORY_TIER_3';
+    key: 'STATUS' | 'PRIORITY' | 'TEAM' | 'CATEGORY_TIER_1' | 'CATEGORY_TIER_2' | 'CATEGORY_TIER_3' | 'SLA_STATUS';
     value: string;
     source: string;
   } | null>(null);
@@ -55,19 +56,19 @@ export const DashboardPage = () => {
   }, []);
 
   const handleToggleFilter = (filterName: MultiFilterName, value: string) => {
-    setFilters((prev) => { 
+    setFilters((prev) => {
       const currentValues = prev[filterName];
 
-      const nextValues = currentValues.includes(value) 
+      const nextValues = currentValues.includes(value)
         ? currentValues.filter((item) => item !== value)
         : [...currentValues, value];
 
       return {
         ...prev, [filterName]: nextValues,
       };
-     });
+    });
 
-     setChartSelection(null);
+    setChartSelection(null);
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,6 +115,17 @@ export const DashboardPage = () => {
     fetch(`http://127.0.0.1:8000/tickets?${params.toString()}`)
       .then((response) => response.json())
       .then((data) => {
+
+        // DEBUG LOG 1: What does the raw array item actually contain?
+        console.log('--- DEBUG: RAW BACKEND TICKETS ---');
+        console.log('Total tickets array size:', data?.length);
+        if (data && data.length > 0) {
+          console.log('Keys present in first ticket object:', Object.keys(data[0]));
+          console.log('Full first ticket content instance:', data[0]);
+        } else {
+          console.log('WARNING: Backend returned an empty ticket array!');
+        }
+
         setTickets(data);
         setLoading(false);
       })
@@ -124,10 +136,21 @@ export const DashboardPage = () => {
   }, [filters]);
 
   const filteredTickets = chartSelection
-    ? tickets.filter((ticket) => {
-        const ticketValue = ticket[chartSelection.key];
-        return typeof ticketValue === 'string' && ticketValue === chartSelection.value;
-      })
+    ? tickets.filter((ticket, index) => {
+      const ticketValue = ticket[chartSelection.key];
+
+      // DEBUG LOG 2: Log details for the first 3 items to observe evaluation patterns
+      if (index < 3) {
+        console.log(`--- DEBUG: EVALUATING FILTER ON ROW [${index}] ---`);
+        console.log('Selected Target Key:', chartSelection.key);
+        console.log('Selected Target Value expected:', `"${chartSelection.value}"`);
+        console.log('Actual value read on ticket instance:', `"${ticketValue}"`);
+        console.log('Data type discovered:', typeof ticketValue);
+        console.log('Match determination result:', ticketValue === chartSelection.value);
+      }
+
+      return typeof ticketValue === 'string' && ticketValue === chartSelection.value;
+    })
     : tickets;
 
   useEffect(() => {
@@ -140,23 +163,12 @@ export const DashboardPage = () => {
     <>
       <Header />
       <main className="dashboard-container">
-        
-        {/* NEW: Collapsible Section Controller Bar Component */}
-        <div className="collapsible-drawer-control">
-          <button 
-            type="button" 
-            className="drawer-toggle-btn"
-            onClick={() => setIsControlsExpanded(!isControlsExpanded)}
-          >
-            <span className={`arrow-indicator ${isControlsExpanded ? 'is-open' : ''}`}>
-              ▼
-            </span>
-            {isControlsExpanded ? 'Hide Filters & Analytics' : 'Show Filters & Analytics'}
-          </button>
-        </div>
 
-        {/* NEW: Conditional Outer Accordion Section Wrapper */}
-        <div className={`collapsible-drawer-content ${isControlsExpanded ? 'expanded' : 'collapsed'}`}>
+
+        <KPICollapsibleDrawer
+          labelExpanded="Hide Filters & Analytics"
+          labelCollapsed="Show Filters & Analytics"
+        >
           <KPIFilterBar
             filters={filters}
             filterOptions={filterOptions}
@@ -167,7 +179,7 @@ export const DashboardPage = () => {
           <section className="analytics-section">
             <KpiDashboard filters={filters} onChartSelection={setChartSelection} />
           </section>
-        </div>
+        </KPICollapsibleDrawer>
 
         {/* Detailed Ticket View */}
         <section className="data-section" ref={dataSectionRef}>
@@ -208,21 +220,21 @@ export const DashboardPage = () => {
                     const isCritical = ticket.PRIORITY === 'Critical';
 
                     return (
-                    <tr
-                      key={ticket.TICKET_NUMBER}
-                      className={isCritical ? 'row-critical' : undefined}
-                    >
-                      <td className="ticket-id">{ticket.TICKET_NUMBER}</td>
-                      <td>
-                        <span className={`status-badge ${statusClass}`}>
-                          {ticket.STATUS}
-                        </span>
-                      </td>
-                      <td className={isCritical ? 'priority-critical' : undefined}>{ticket.PRIORITY}</td>
-                      <td>{ticket.SERVICE}</td>
-                      <td>{ticket.ASSIGNED_PERSON}</td>
-                      <td className="ticket-date">{new Date(ticket.SUBMIT_DATETIME).toLocaleDateString()}</td>
-                    </tr>
+                      <tr
+                        key={ticket.TICKET_NUMBER}
+                        className={isCritical ? 'row-critical' : undefined}
+                      >
+                        <td className="ticket-id">{ticket.TICKET_NUMBER}</td>
+                        <td>
+                          <span className={`status-badge ${statusClass}`}>
+                            {ticket.STATUS}
+                          </span>
+                        </td>
+                        <td className={isCritical ? 'priority-critical' : undefined}>{ticket.PRIORITY}</td>
+                        <td>{ticket.SERVICE}</td>
+                        <td>{ticket.ASSIGNED_PERSON}</td>
+                        <td className="ticket-date">{new Date(ticket.SUBMIT_DATETIME).toLocaleDateString()}</td>
+                      </tr>
                     );
                   })}
                 </tbody>

@@ -13,4 +13,6 @@ export interface Ticket {
     DESCRIPTION: string;
     SUBMIT_DATETIME: string; // Dates come as strings in JSON
     RESOLVED_DATETIME: string | null;
+    SLA_STATUS: 'In SLA' | 'Out of SLA';
+    SLA_INTERVAL?: string;
 }
