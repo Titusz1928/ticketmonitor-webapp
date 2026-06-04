@@ -117,7 +117,8 @@ function Chat() {
       const response = await axios.post('http://127.0.0.1:8000/chat', {
         message: text,
         conversation_id: 1,
-        user_id: 1
+        user_id: 1,
+        ticket_id: 1,
       });
       const aiMessage: Message = {
         role: "ai",
