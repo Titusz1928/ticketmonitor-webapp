@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import './App.css';
 
 const SUGGESTIONS = [
   "Care sunt ultimele 5 tichete deschise?",
@@ -45,6 +46,7 @@ function Chat() {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
 
@@ -117,7 +119,8 @@ function Chat() {
       const response = await axios.post('http://127.0.0.1:8000/chat', {
         message: text,
         conversation_id: 1,
-        user_id: 1
+        user_id: 1,
+        ticket_id: "1"
       });
       const aiMessage: Message = {
         role: "ai",
@@ -152,9 +155,8 @@ function Chat() {
   };
 
   return (
-    <>
+    <div className="chat-container">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700&family=Sora:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap');
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(6px); }
@@ -170,21 +172,6 @@ function Chat() {
         }
 
         .chat-message { animation: messageIn 0.2s ease; }
-
-        .chat-input {
-          flex: 1;
-          padding: 10px 14px;
-          border-radius: 6px;
-          border: 1px solid #e2e8f0;
-          background-color: #f0f5ff;
-          font-family: 'Sora', sans-serif;
-          font-size: 14px;
-          color: #334155;
-          outline: none;
-          transition: border-color 0.15s ease;
-        }
-        .chat-input:focus { border-color: rgba(37, 99, 235, 0.4); }
-        .chat-input::placeholder { color: #94a3b8; }
 
         .chat-send-btn {
           padding: 10px 20px;
@@ -286,184 +273,377 @@ function Chat() {
         }
         .scroll-to-bottom-btn:hover { background-color: #2563eb; color: white; border-color: #2563eb; }
 
+        .guide-btn {
+          margin-left: auto;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: 1px solid rgba(37, 99, 235, 0.2);
+          background-color: rgba(37, 99, 235, 0.06);
+          color: #2563eb;
+          cursor: pointer;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 14px;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s ease;
+          flex-shrink: 0;
+        }
+        .guide-btn:hover { background-color: rgba(37, 99, 235, 0.12); border-color: #2563eb; }
+
+        .guide-modal::-webkit-scrollbar { width: 6px; }
+        .guide-modal::-webkit-scrollbar-track { background: transparent; }
+        .guide-modal::-webkit-scrollbar-thumb { background: rgba(37, 99, 235, 0.2); border-radius: 3px; }
+        .guide-modal::-webkit-scrollbar-thumb:hover { background: rgba(37, 99, 235, 0.4); }
+
         .chat-window::-webkit-scrollbar { width: 6px; }
         .chat-window::-webkit-scrollbar-track { background: transparent; }
         .chat-window::-webkit-scrollbar-thumb { background: rgba(37, 99, 235, 0.2); border-radius: 3px; }
         .chat-window::-webkit-scrollbar-thumb:hover { background: rgba(37, 99, 235, 0.4); }
       `}</style>
 
-      <div style={{
-        maxWidth: '680px',
-        margin: '0 auto',
-        fontFamily: "'Sora', sans-serif",
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-      }}>
+      {/* Header */}
+      <header className="chat-header">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Nokia_2023.svg"
+          alt="Nokia Logo"
+          style={{ height: '30px', width: 'auto' }}
+        />
+        <h2>Asistent Ticketing Nokia</h2>
+        <button className="guide-btn" onClick={() => setShowGuide(true)}>?</button>
+      </header>
 
-        <h2 style={{
-          fontFamily: "'Syne', sans-serif",
-          color: '#0b1d4f',
-          fontSize: '20px',
-          margin: 0,
-          letterSpacing: '-0.3px',
-          fontWeight: 700,
+      {/* Fereastra chat */}
+      <div className="chat-messages-wrapper">
+        <div ref={chatWindowRef} className="chat-window" style={{
+          height: '100%',
+          overflowY: 'scroll',
+          padding: '20px',
+          backgroundColor: '#ffffff',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
         }}>
-          Asistent Ticketing Nokia
-        </h2>
+          {messages.map((msg, index) => {
+            const prevMsg = messages[index - 1];
+            const showDateSeparator = !msg.isWelcome && (!prevMsg || !isSameDay(prevMsg.timestamp, msg.timestamp));
 
-        <div style={{ position: 'relative' }}>
-          <div ref={chatWindowRef} className="chat-window" style={{
-            border: '1px solid rgba(37, 99, 235, 0.1)',
-            height: '420px',
-            overflowY: 'scroll',
-            padding: '20px',
-            borderRadius: '12px',
-            backgroundColor: '#ffffff',
-            boxShadow: '0 2px 12px rgba(37, 99, 235, 0.06)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-          }}>
-            {messages.map((msg, index) => {
-              const prevMsg = messages[index - 1];
-              const showDateSeparator = !msg.isWelcome && (!prevMsg || !isSameDay(prevMsg.timestamp, msg.timestamp));
-
-              return (
-                <div key={index} className="chat-message">
-                  {showDateSeparator && (
-                    <div className="date-separator">
-                      <span style={{
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: '11px',
-                        color: '#94a3b8',
-                        letterSpacing: '0.5px',
-                      }}>
-                        {formatDate(msg.timestamp)}
-                      </span>
-                    </div>
-                  )}
-
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                    flexDirection: 'column',
-                    alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                    gap: '3px',
-                  }}>
-                    <div style={{
-                      padding: '10px 14px',
-                      borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-                      backgroundColor:
-                        msg.role === 'user' ? '#2563eb' :
-                        msg.role === 'error' ? 'rgba(220, 38, 38, 0.08)' :
-                        '#f0f5ff',
-                      color:
-                        msg.role === 'user' ? '#ffffff' :
-                        msg.role === 'error' ? '#dc2626' :
-                        '#334155',
-                      border:
-                        msg.role === 'error' ? '1px solid rgba(220, 38, 38, 0.2)' :
-                        msg.role === 'ai' ? '1px solid rgba(56, 189, 248, 0.3)' :
-                        'none',
-                      borderLeft:
-                        msg.role === 'ai' ? '3px solid #38bdf8' : undefined,
-                      maxWidth: '75%',
-                      fontSize: '14px',
-                      lineHeight: '1.6',
-                      fontFamily: "'Sora', sans-serif",
+            return (
+              <div key={index} className="chat-message">
+                {showDateSeparator && (
+                  <div className="date-separator">
+                    <span style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '11px',
+                      color: '#94a3b8',
+                      letterSpacing: '0.5px',
                     }}>
-                      {msg.text}
-                    </div>
-
-                    {!msg.isWelcome && (
-                      <span style={{
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: '11px',
-                        color: '#94a3b8',
-                      }}>
-                        {formatTime(msg.timestamp)}
-                      </span>
-                    )}
+                      {formatDate(msg.timestamp)}
+                    </span>
                   </div>
-                </div>
-              );
-            })}
+                )}
 
-            {isLoading && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: '#94a3b8',
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '12px',
-              }}>
                 <div style={{
-                  width: '14px', height: '14px',
-                  border: '2px solid #e2e8f0',
-                  borderTop: '2px solid #2563eb',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  flexShrink: 0,
-                }}/>
-                SE PROCESEAZĂ...
-              </div>
-            )}
-          </div>
+                  display: 'flex',
+                  justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                  flexDirection: 'column',
+                  alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                  gap: '3px',
+                }}>
+                  <div style={{
+                    padding: '10px 14px',
+                    borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                    backgroundColor:
+                      msg.role === 'user' ? '#2563eb' :
+                      msg.role === 'error' ? 'rgba(220, 38, 38, 0.08)' :
+                      '#f0f5ff',
+                    color:
+                      msg.role === 'user' ? '#ffffff' :
+                      msg.role === 'error' ? '#dc2626' :
+                      '#334155',
+                    border:
+                      msg.role === 'error' ? '1px solid rgba(220, 38, 38, 0.2)' :
+                      msg.role === 'ai' ? '1px solid rgba(56, 189, 248, 0.3)' :
+                      'none',
+                    borderLeft:
+                      msg.role === 'ai' ? '3px solid #38bdf8' : undefined,
+                    maxWidth: '75%',
+                    fontSize: '14px',
+                    lineHeight: '1.6',
+                    fontFamily: "'Sora', sans-serif",
+                    textAlign: 'left',
+                  }}>
+                    {msg.text}
+                  </div>
 
-          {showScrollBtn && (
-            <button className="scroll-to-bottom-btn" onClick={scrollToBottom}>
-              ↓
-            </button>
+                  {!msg.isWelcome && (
+                    <span style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '11px',
+                      color: '#94a3b8',
+                    }}>
+                      {formatTime(msg.timestamp)}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          <div style={{ minHeight: '20px', flexShrink: 0 }} />
+        </div>
+
+        {showScrollBtn && (
+          <button className="scroll-to-bottom-btn" onClick={scrollToBottom}>
+            ↓
+          </button>
+        )}
+      </div>
+
+      {/* Spinner */}
+      {isLoading && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          color: '#94a3b8',
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '12px',
+          padding: '8px 32px',
+          backgroundColor: '#ffffff',
+        }}>
+          <div style={{
+            width: '14px', height: '14px',
+            border: '2px solid #e2e8f0',
+            borderTop: '2px solid #2563eb',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            flexShrink: 0,
+          }}/>
+          SE PROCESEAZĂ...
+        </div>
+      )}
+
+      {/* Input area */}
+      <div className="chat-input-area">
+        <input
+          type="text"
+          className="chat-input"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' ? handleSendMessage() : null}
+          placeholder="Întreabă despre tichete..."
+        />
+
+        <div ref={suggestionsRef} style={{ position: 'relative' }}>
+          <button
+            className={`suggestions-btn ${showSuggestions ? 'active' : ''}`}
+            onClick={() => setShowSuggestions(!showSuggestions)}
+            title="Sugestii"
+          >
+            ✦
+          </button>
+
+          {showSuggestions && (
+            <div className="suggestions-popover">
+              {SUGGESTIONS.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  className="suggestion-item"
+                  onClick={() => handleSuggestionClick(suggestion)}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', position: 'relative', alignItems: 'center' }}>
-          <input
-            type="text"
-            className="chat-input"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' ? handleSendMessage() : null}
-            placeholder="Întreabă despre tichete..."
-          />
-
-          <div ref={suggestionsRef} style={{ position: 'relative' }}>
-            <button
-              className={`suggestions-btn ${showSuggestions ? 'active' : ''}`}
-              onClick={() => setShowSuggestions(!showSuggestions)}
-              title="Sugestii"
-            >
-              ✦
-            </button>
-
-            {showSuggestions && (
-              <div className="suggestions-popover">
-                {SUGGESTIONS.map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    className="suggestion-item"
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <button
-            className="chat-send-btn"
-            onClick={handleSendMessage}
-            disabled={isLoading}
-          >
-            TRIMITE
-          </button>
-        </div>
-
+        <button
+          className="chat-send-btn"
+          onClick={handleSendMessage}
+          disabled={isLoading}
+        >
+          TRIMITE
+        </button>
       </div>
-    </>
+
+      {/* Modal Ghid */}
+      {showGuide && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100,
+        }} onClick={() => setShowGuide(false)}>
+          <div
+            className="guide-modal"
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              padding: '32px',
+              maxWidth: '560px',
+              width: '90%',
+              border: '1px solid rgba(37, 99, 235, 0.1)',
+              boxShadow: '0 8px 30px rgba(37, 99, 235, 0.12)',
+              maxHeight: '80vh',
+              overflowY: 'auto',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header modal */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h3 style={{
+                fontFamily: "'Syne', sans-serif",
+                color: '#0b1d4f',
+                margin: 0,
+                fontSize: '18px',
+              }}>
+                Ghid de utilizare
+              </h3>
+              <button onClick={() => setShowGuide(false)} style={{
+                border: 'none',
+                background: 'transparent',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                fontSize: '20px',
+                lineHeight: '1',
+              }}>✕</button>
+            </div>
+
+            {/* Important */}
+            <div style={{
+              backgroundColor: 'rgba(37, 99, 235, 0.04)',
+              border: '1px solid rgba(37, 99, 235, 0.15)',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              marginBottom: '20px',
+              fontSize: '14px',
+              fontFamily: "'Sora', sans-serif",
+              color: '#334155',
+            }}>
+              <span style={{ color: '#2563eb', fontWeight: 600 }}>Important: </span>
+              Botul răspunde doar la întrebări despre proiectul tău. Întrebările despre alte proiecte sau despre întreaga bază de date nu vor returna rezultate relevante.
+            </div>
+
+            {/* Ce poate face botul */}
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                color: '#2563eb',
+                fontSize: '11px',
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                margin: '0 0 10px 0',
+              }}>CE POATE FACE BOTUL</h4>
+              {[
+                'Numărul de tichete după status, prioritate sau echipă',
+                'Tichete asignate unei persoane din proiectul tău',
+                'Statistici despre rezolvare și SLA',
+                'Ultimele tichete deschise sau critice din proiectul tău',
+              ].map((item, i) => (
+                <div key={i} style={{
+                  display: 'flex', gap: '8px', marginBottom: '6px',
+                  fontSize: '14px', color: '#334155', fontFamily: "'Sora', sans-serif",
+                }}>
+                  <span style={{ color: '#38bdf8', flexShrink: 0 }}>✓</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+
+            {/* Exemple */}
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                color: '#2563eb',
+                fontSize: '11px',
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                margin: '0 0 10px 0',
+              }}>EXEMPLE DE ÎNTREBĂRI BUNE</h4>
+              {[
+                'Cate tichete sunt cu prioritate Critical?',
+                'Cate tichete nu sunt rezolvate?',
+                'Care sunt ultimele 5 tichete deschise?',
+                'Cate tichete a rezolvat fiecare echipa?',
+                'Care este timpul mediu de rezolvare?',
+              ].map((item, i) => (
+                <div key={i} style={{
+                  backgroundColor: '#f0f5ff',
+                  borderRadius: '6px',
+                  padding: '8px 12px',
+                  marginBottom: '6px',
+                  fontSize: '13px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color: '#334155',
+                  borderLeft: '3px solid #38bdf8',
+                }}>
+                  {item}
+                </div>
+              ))}
+            </div>
+
+            {/* Limite */}
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                color: '#2563eb',
+                fontSize: '11px',
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                margin: '0 0 10px 0',
+              }}>LIMITE TEHNICE</h4>
+              {[
+                'Nu poate modifica sau șterge tichete',
+                'Nu răspunde la întrebări care nu sunt despre tichete',
+                'Răspunsurile depind de datele din baza de date',
+                'Întrebările trebuie formulate în limbaj natural, nu SQL',
+                'Nu poate accesa date din afara proiectului tău',
+              ].map((item, i) => (
+                <div key={i} style={{
+                  display: 'flex', gap: '8px', marginBottom: '6px',
+                  fontSize: '14px', color: '#334155', fontFamily: "'Sora', sans-serif",
+                }}>
+                  <span style={{ color: '#dc2626', flexShrink: 0 }}>✕</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+
+            {/* Sfaturi */}
+            <div>
+              <h4 style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                color: '#2563eb',
+                fontSize: '11px',
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                margin: '0 0 10px 0',
+              }}>SFATURI</h4>
+              {[
+                'Folosește butonul ✦ pentru întrebări rapide predefinite',
+                'Fii specific — "tichete Critical neasignate" e mai bun decât "tichete"',
+                'Poți întreba despre perioade de timp: "tichete deschise săptămâna asta"',
+              ].map((item, i) => (
+                <div key={i} style={{
+                  display: 'flex', gap: '8px', marginBottom: '6px',
+                  fontSize: '14px', color: '#334155', fontFamily: "'Sora', sans-serif",
+                }}>
+                  <span style={{ color: '#2563eb', flexShrink: 0 }}>→</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
