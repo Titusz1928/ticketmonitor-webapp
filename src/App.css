@@ -1,8 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Sora:wght@400;500;600&family=Syne:wght@600;700;800&display=swap');
 
-/* ==========================================
-   1. DESIGN SYSTEM - VARIABILE OFICIALE
-   ========================================== */
 :root {
   --blue-primary: #2563eb;
   --blue-light: #4f86f7;
@@ -22,10 +19,7 @@
   --shadow-blue: 0 8px 30px rgba(37, 99, 235, 0.08); /* Umbră mai elegantă */
 }
 
-/* ==========================================
-   2. SUPRASCRIERE VITE & FUNDAL GLOBAL
-   ========================================== */
-html, body {
+html, body, #root {
   margin: 0 !important;
   padding: 0 !important;
   width: 100%;
@@ -46,9 +40,6 @@ html, body {
   background-color: var(--bg-main);
 }
 
-/* ==========================================
-   3. STRUCTURA FERESTREI DE CHAT
-   ========================================== */
 .chat-container {
   width: 100%;
   max-width: 900px;

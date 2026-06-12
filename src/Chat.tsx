@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import './App.css';
+// import { useState, useEffect, useRef } from 'react';
+// import axios from 'axios';
+// import './App.css';
 
 const SUGGESTIONS = [
   "Care sunt ultimele 5 tichete deschise?",
@@ -647,4 +647,4 @@ function Chat() {
   );
 }
 
-export default Chat;
+// export default Chat;
